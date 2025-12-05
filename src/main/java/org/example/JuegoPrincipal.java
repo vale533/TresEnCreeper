@@ -4,6 +4,9 @@ import org.example.excepciones.BombayaExistenteException;
 import org.example.excepciones.CasillaIsAtacadaException;
 import org.example.excepciones.TurnoNoHabilitado;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class JuegoPrincipal {
 
     private Tablero tableroDeJuego;
@@ -83,5 +86,11 @@ public class JuegoPrincipal {
 
     public int[] getPosicionBomba() {
         return new int[]{posFilaBomba, posColumnaBomba};
+    }
+    public List<int[]> obtenerCasillasSeguras() {
+        return tableroDeJuego.obtenerTodasLasCasillas().stream()
+                .filter(c -> !c.tieneBomba())
+                .map(c -> new int[]{c.fila, c.columna})
+                .collect(Collectors.toList());
     }
 }

@@ -1,12 +1,16 @@
 package org.example;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Tablero {
-    Casilla[][]casillasDelTablero;
+    Casilla[][] casillasDelTablero;
 
     public Tablero(int filasTablero, int columnasTablero) {
-        casillasDelTablero= new Casilla[filasTablero][columnasTablero];
-        for (int i = 0; i <filasTablero ; i++) {
-            for (int j = 0; j <columnasTablero; j++) {
-                casillasDelTablero[i][j]=new Casilla(i,j);
+        casillasDelTablero = new Casilla[filasTablero][columnasTablero];
+        for (int i = 0; i < filasTablero; i++) {
+            for (int j = 0; j < columnasTablero; j++) {
+                casillasDelTablero[i][j] = new Casilla(i, j);
             }
         }
     }
@@ -31,4 +35,36 @@ public class Tablero {
         return obtenerCasilla(fila, columna).estaUsada();
     }
 
+
+    public List<Casilla> obtenerCasillasUsadas() {
+        return Arrays.stream(casillasDelTablero)
+                .flatMap(Arrays::stream)
+                .filter(Casilla::estaUsada)
+                .collect(Collectors.toList());
+    }
+
+    public long contarLibres() {
+        return Arrays.stream(casillasDelTablero)
+                .flatMap(Arrays::stream)
+                .filter(c -> !c.estaUsada())
+                .count();
+    }
+
+    public List<Casilla> obtenerTodasLasCasillas() {
+        return Arrays.stream(casillasDelTablero)
+                .flatMap(Arrays::stream)
+                .collect(Collectors.toList());
+    }
+
+    public boolean hayBomba() {
+        return Arrays.stream(casillasDelTablero)
+                .flatMap(Arrays::stream)
+                .anyMatch(Casilla::tieneBomba);
+    }
+
+    public boolean todasUsadas() {
+        return Arrays.stream(casillasDelTablero)
+                .flatMap(Arrays::stream)
+                .allMatch(Casilla::estaUsada);
+    }
 }

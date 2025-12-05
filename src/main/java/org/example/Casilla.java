@@ -2,8 +2,8 @@ package org.example;
 
 public class Casilla {
 
-    int fila;
-    int columna;
+    public int fila;
+    public int columna;
     boolean bomba;
     boolean usada;
 
