@@ -8,13 +8,25 @@ import java.awt.Color;
 public class ventanaSeleccionBomba extends JFrame {
 
     private JuegoPrincipal partidaActual;
-    private Jugador system;
+    private Jugador jugador;
     private JLabel[][] tablero;
-
+    private boolean soyServidor;
     public ventanaSeleccionBomba() {
+        soyServidor = true;
         partidaActual = new JuegoPrincipal(3, 4);
-        system = new JugadorSystem("Jugador1", partidaActual);
+        jugador = new JugadorSystem("Servidor", partidaActual);
+        ((JugadorSystem) jugador).crearServidor();
 
+        inicializar();
+    }
+    public ventanaSeleccionBomba(String ip) {
+        soyServidor = false;
+        partidaActual = new JuegoPrincipal(3, 4);
+        jugador = new JugadorConectado("Cliente", partidaActual, ip);
+
+        inicializar();
+    }
+    private void inicializar() {
         configurarComponentes();
         this.setSize(600, 500);
         setLocationRelativeTo(null);
@@ -26,7 +38,6 @@ public class ventanaSeleccionBomba extends JFrame {
                 {casilla9, casilla10, casilla11, casilla12}
         };
     }
-
     private void configurarComponentes() {
         casilla1 = new JLabel();
         casilla2 = new JLabel();
@@ -189,21 +200,27 @@ public class ventanaSeleccionBomba extends JFrame {
             partidaActual.seleccionarUbicacionBomba(f, c);
 
             tablero[f][c].setBackground(new Color(220, 20, 60));
-
             tablero[f][c].setHorizontalAlignment(SwingConstants.CENTER);
 
-            System.out.println("Bomba puesta: " + (f+1) + "," + (c+1));
+            System.out.println("TNT: " + (f+1) + "," + (c+1));
+
+            if (soyServidor) {
+                JugadorSystem js = (JugadorSystem) jugador;
+                js.enviarTNT(f, c);
+            } else {
+                JugadorConectado jc = (JugadorConectado) jugador;
+                jc.enviarTNT(f, c);
+            }
 
             JOptionPane.showMessageDialog(this,
-                    "Tu bomba esta en la posicion " + (f+1) + "," + (c+1),
+                    "TNT en " + (f+1) + "," + (c+1),
                     "Listo",
                     JOptionPane.INFORMATION_MESSAGE);
 
         } catch (BombayaExistenteException e) {
-            System.err.println("Error: " + e.getMessage());
             JOptionPane.showMessageDialog(this,
                     e.getMessage(),
-                    "Error - Tnt ya colocada",
+                    "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
