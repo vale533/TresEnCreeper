@@ -2,6 +2,9 @@ package org.example;
 
 import org.example.excepciones.BombayaExistenteException;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.Color;
 
@@ -11,21 +14,27 @@ public class ventanaSeleccionBomba extends JFrame {
     private Jugador jugador;
     private JLabel[][] tablero;
     private boolean soyServidor;
+    private boolean juegoIniciado = false;
+
     public ventanaSeleccionBomba() {
         soyServidor = true;
         partidaActual = new JuegoPrincipal(3, 4);
         jugador = new JugadorSystem("Servidor", partidaActual);
         ((JugadorSystem) jugador).crearServidor();
+        ((JugadorSystem) jugador).setVentana(this);
 
         inicializar();
     }
+
     public ventanaSeleccionBomba(String ip) {
         soyServidor = false;
         partidaActual = new JuegoPrincipal(3, 4);
         jugador = new JugadorConectado("Cliente", partidaActual, ip);
+        ((JugadorConectado) jugador).setVentana(this);
 
         inicializar();
     }
+
     private void inicializar() {
         configurarComponentes();
         this.setSize(600, 500);
@@ -38,6 +47,29 @@ public class ventanaSeleccionBomba extends JFrame {
                 {casilla9, casilla10, casilla11, casilla12}
         };
     }
+
+    public void iniciarJuego() {
+        juegoIniciado = true;
+        setTitle("Encuentra la TNT del rival!");
+
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this,
+                    "Empieza el juego!\nHaz click en casillas para buscar la TNT del rival",
+                    "A JUGAR!",
+                    JOptionPane.INFORMATION_MESSAGE);
+        });
+    }
+
+    public void mostrarGanaste() {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this,
+                    "El rival toco tu TNT!\nGANASTE!",
+                    "VICTORIA!",
+                    JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+        });
+    }
+
     private void configurarComponentes() {
         casilla1 = new JLabel();
         casilla2 = new JLabel();
@@ -196,32 +228,63 @@ public class ventanaSeleccionBomba extends JFrame {
     }
 
     private void seleccionarPosicion(int f, int c) {
-        try {
-            partidaActual.seleccionarUbicacionBomba(f, c);
 
-            tablero[f][c].setBackground(new Color(220, 20, 60));
-            tablero[f][c].setHorizontalAlignment(SwingConstants.CENTER);
+        if (!partidaActual.yaPusoBomba()) {
+            try {
+                partidaActual.seleccionarUbicacionBomba(f, c);
 
-            System.out.println("TNT: " + (f+1) + "," + (c+1));
+                tablero[f][c].setBackground(new Color(220, 20, 60));
+                tablero[f][c].setHorizontalAlignment(SwingConstants.CENTER);
 
+
+                if (soyServidor) {
+                    JugadorSystem js = (JugadorSystem) jugador;
+                    js.enviarTNT(f, c);
+                } else {
+                    JugadorConectado jc = (JugadorConectado) jugador;
+                    jc.enviarTNT(f, c);
+                }
+
+
+            } catch (BombayaExistenteException e) {
+                JOptionPane.showMessageDialog(this,
+                        e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        else if (juegoIniciado) {
+            atacarCasilla(f, c);
+        }
+    }
+
+    private void atacarCasilla(int f, int c) {
+        int[] tntRival;
+        if (soyServidor) {
+            tntRival = ((JugadorSystem) jugador).getTNTRival();
+        } else {
+            tntRival = ((JugadorConectado) jugador).getTNTRival();
+        }
+
+        if (f == tntRival[0] && c == tntRival[1]) {
+            tablero[f][c].setIcon(new ImageIcon(getClass().getResource("/imagenes/tnticon.jpg")));
+            reproducirSonido("/sonido/boom.wav");
             if (soyServidor) {
-                JugadorSystem js = (JugadorSystem) jugador;
-                js.enviarTNT(f, c);
+                ((JugadorSystem) jugador).enviarPerdi();
             } else {
-                JugadorConectado jc = (JugadorConectado) jugador;
-                jc.enviarTNT(f, c);
+                ((JugadorConectado) jugador).enviarPerdi();
             }
 
             JOptionPane.showMessageDialog(this,
-                    "TNT en " + (f+1) + "," + (c+1),
-                    "Listo",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-        } catch (BombayaExistenteException e) {
-            JOptionPane.showMessageDialog(this,
-                    e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                    "Tocaste la bomba del rival!\nPERDISTE!",
+                    "GAME OVER",
+                    JOptionPane.PLAIN_MESSAGE,new ImageIcon(getClass().getResource("/imagenes/explosionGif.gif"))
+            );
+            this.dispose();
+        } else {
+            tablero[f][c].setIcon(new ImageIcon(getClass().getResource("/imagenes/diamondicon.jpg")));
+            reproducirSonido("/sonido/breaking.wav");
+            System.out.println("casilla segura");
         }
     }
 
@@ -232,6 +295,7 @@ public class ventanaSeleccionBomba extends JFrame {
             }
         });
     }
+
 
     private JLabel casilla1;
     private JLabel casilla2;
@@ -246,4 +310,14 @@ public class ventanaSeleccionBomba extends JFrame {
     private JLabel casilla11;
     private JLabel casilla12;
     private JLabel fondoPantalla;
+    public void reproducirSonido(String ruta) {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass().getResource(ruta));
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -1,11 +1,10 @@
 package org.example;
 
-import java.io.IOException;
-
 import java.io.*;
 import java.net.*;
 
 public class JugadorSystem extends Jugador {
+
     private ServerSocket servidor;
     private Socket cliente;
     private ObjectOutputStream salida;
@@ -17,9 +16,15 @@ public class JugadorSystem extends Jugador {
     private boolean miTNTLista = false;
     private boolean rivalListo = false;
 
+    private ventanaSeleccionBomba ventana;
+
     public JugadorSystem(String nombre, JuegoPrincipal partida) {
         super(nombre, partida);
         tieneConexion = false;
+    }
+
+    public void setVentana(ventanaSeleccionBomba v) {
+        this.ventana = v;
     }
 
     public void crearServidor() {
@@ -63,8 +68,15 @@ public class JugadorSystem extends Jugador {
             tntRival[0] = Integer.parseInt(partes[1]);
             tntRival[1] = Integer.parseInt(partes[2]);
             rivalListo = true;
-            if (miTNTLista) {
+
+            if (miTNTLista && ventana != null) {
                 System.out.println("ambos listos!");
+                ventana.iniciarJuego();
+            }
+        } else if (msg.equals("PERDI")) {
+            System.out.println("rival perdio, yo gane!");
+            if (ventana != null) {
+                ventana.mostrarGanaste();
             }
         }
     }
@@ -89,18 +101,38 @@ public class JugadorSystem extends Jugador {
                 salida.writeObject(msg);
                 salida.flush();
                 System.out.println("mi tnt enviada");
+
+                if (rivalListo && ventana != null) {
+                    System.out.println("ambos listos!");
+                    ventana.iniciarJuego();
+                }
             } catch (IOException e) {
                 System.out.println("error enviando");
             }
+        } else {
+            if (rivalListo && ventana != null) {
+                System.out.println("ambos listos!");
+                ventana.iniciarJuego();
+            }
         }
+    }
+
+    public void enviarPerdi() {
+        if (tieneConexion) {
+            try {
+                salida.writeObject("PERDI");
+                salida.flush();
+            } catch (IOException e) {
+                System.out.println("error");
+            }
+        }
+    }
+
+    public int[] getTNTRival() {
+        return tntRival;
     }
 
     public boolean hayConexion() {
         return tieneConexion;
     }
-
-
-
-
-
 }

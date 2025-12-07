@@ -15,6 +15,8 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
     private boolean miTNTLista = false;
     private boolean rivalListo = false;
 
+    private ventanaSeleccionBomba ventana;
+
     public JugadorConectado(String nombre, JuegoPrincipal partida, String ip) {
         super(nombre, partida);
         conectado = false;
@@ -31,6 +33,10 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
         } catch (IOException e) {
             System.out.println("no se pudo conectar: " + e.getMessage());
         }
+    }
+
+    public void setVentana(ventanaSeleccionBomba v) {
+        this.ventana = v;
     }
 
     private void escuchar() {
@@ -53,8 +59,15 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
             tntRival[0] = Integer.parseInt(partes[1]);
             tntRival[1] = Integer.parseInt(partes[2]);
             rivalListo = true;
-            if (miTNTLista) {
+
+            if (miTNTLista && ventana != null) {
                 System.out.println("ambos listos!");
+                ventana.iniciarJuego();
+            }
+        } else if (msg.equals("PERDI")) {
+            System.out.println("rival perdio, yo gane!");
+            if (ventana != null) {
+                ventana.mostrarGanaste();
             }
         }
     }
@@ -94,9 +107,27 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
             salida.writeObject(msg);
             salida.flush();
             System.out.println("mi tnt enviada");
+
+            if (rivalListo && ventana != null) {
+                System.out.println("ambos listos!");
+                ventana.iniciarJuego();
+            }
         } catch (IOException e) {
             System.out.println("error enviando");
         }
+    }
+
+    public void enviarPerdi() {
+        try {
+            salida.writeObject("PERDI");
+            salida.flush();
+        } catch (IOException e) {
+            System.out.println("error");
+        }
+    }
+
+    public int[] getTNTRival() {
+        return tntRival;
     }
 
     public boolean estaConectado() {
