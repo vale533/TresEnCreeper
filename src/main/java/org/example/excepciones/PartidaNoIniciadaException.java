@@ -16,11 +16,4 @@ public class PartidaNoIniciadaException extends RuntimeException {
         this.motivoBloqueo = motivo;
     }
 
-    public String getAccionIntentada() {
-        return accionIntentada;
-    }
-
-    public String getMotivoBloqueo() {
-        return motivoBloqueo;
-    }
 }

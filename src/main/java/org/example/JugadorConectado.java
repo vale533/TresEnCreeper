@@ -130,7 +130,4 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
         return tntRival;
     }
 
-    public boolean estaConectado() {
-        return conectado;
-    }
 }

@@ -226,9 +226,9 @@ public class JuegoTNTTest {
     void testBombayaExistenteExceptionPosicion() {
         BombayaExistenteException exception = new BombayaExistenteException(2, 3);
 
-        assertEquals(2, exception.obtenerFilaAnterior(), "La fila debe ser 2");
-        assertEquals(3, exception.obtenerColumnaAnterior(), "La columna debe ser 3");
-        assertEquals("2,3", exception.obtenerPosicionAnterior(),
+        assertEquals(2, exception.obtenerFilaTest(), "La fila debe ser 2");
+        assertEquals(3, exception.obtenerColumnaTest(), "La columna debe ser 3");
+        assertEquals("2,3", exception.obtenerPosicionTest(),
                 "La posición debe ser '2,3'");
     }
 

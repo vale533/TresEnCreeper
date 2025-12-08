@@ -11,15 +11,15 @@ public class BombayaExistenteException extends Exception{
         this.columnaTest = columna;
     }
 
-    public int obtenerFilaAnterior() {
+    public int obtenerFilaTest() {
         return filaTest;
     }
 
-    public int obtenerColumnaAnterior() {
+    public int obtenerColumnaTest() {
         return columnaTest;
     }
 
-    public String obtenerPosicionAnterior() {
+    public String obtenerPosicionTest() {
         return  filaTest + "," + columnaTest;
     }
 }

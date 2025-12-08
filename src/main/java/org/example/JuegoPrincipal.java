@@ -66,16 +66,6 @@ public class JuegoPrincipal {
         return "Casilla segura.";
     }
 
-    public void iniciarJuego() {
-        if (bombaColocada) {
-            juegoIniciado = true;
-        }
-    }
-
-    public boolean juegoEstaIniciado() {
-        return juegoIniciado;
-    }
-
     public boolean partidaTerminada() {
         return partidaFinalizada;
     }
@@ -92,8 +82,5 @@ public class JuegoPrincipal {
                 .filter(c -> !c.tieneBomba())
                 .map(c -> new int[]{c.fila, c.columna})
                 .collect(Collectors.toList());
-    }
-    public Tablero getTablero() {
-        return tableroDeJuego;
     }
 }

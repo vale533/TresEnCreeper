@@ -132,7 +132,4 @@ public class JugadorSystem extends Jugador {
         return tntRival;
     }
 
-    public boolean hayConexion() {
-        return tieneConexion;
-    }
 }
