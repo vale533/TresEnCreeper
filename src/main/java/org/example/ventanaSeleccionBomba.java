@@ -242,7 +242,7 @@ public class ventanaSeleccionBomba extends JFrame {
                     js.enviarTNT(f, c);
                 } else {
                     JugadorConectado jc = (JugadorConectado) jugador;
-                    jc.enviarTNT(f, c);
+                    jc.enviarMovimiento(f, c);
                 }
 
 

@@ -3,7 +3,7 @@ package org.example;
 import java.io.*;
 import java.net.*;
 
-public class JugadorConectado extends Jugador implements ComunicacionJugador {
+public class JugadorConectado extends Jugador {
 
     private Socket socket;
     private ObjectOutputStream salida;
@@ -44,15 +44,15 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
             try {
                 while (true) {
                     String msg = (String) entrada.readObject();
-                    procesarMensaje(msg);
+                    recibirMovimiento(msg);
                 }
             } catch (Exception e) {
                 System.out.println("conexion perdida");
             }
         }).start();
     }
-
-    private void procesarMensaje(String msg) {
+    @Override
+    public void recibirMovimiento(String msg) {
         String[] partes = msg.split(":");
 
         if (partes[0].equals("TNT")) {
@@ -72,32 +72,10 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
         }
     }
 
-    @Override
-    public void realizarJugada(int fila, int columna) {
-        try {
-            partida.procesarJugada(fila, columna);
-        } catch (Exception e) {
-            System.out.println("error: " + e.getMessage());
-        }
-    }
+
 
     @Override
     public void enviarMovimiento(int fila, int columna) {
-        try {
-            String msg = "ATAQUE:" + fila + ":" + columna;
-            salida.writeObject(msg);
-            salida.flush();
-        } catch (IOException e) {
-            System.out.println("error enviando");
-        }
-    }
-
-    @Override
-    public void recibirMovimiento(int fila, int columna) {
-        System.out.println("movimiento recibido: " + fila + "," + columna);
-    }
-
-    public void enviarTNT(int fila, int columna) {
         miTNT[0] = fila;
         miTNT[1] = columna;
         miTNTLista = true;
@@ -116,6 +94,7 @@ public class JugadorConectado extends Jugador implements ComunicacionJugador {
             System.out.println("error enviando");
         }
     }
+
 
     public void enviarPerdi() {
         try {

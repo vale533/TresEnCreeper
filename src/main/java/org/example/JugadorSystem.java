@@ -53,15 +53,15 @@ public class JugadorSystem extends Jugador {
             try {
                 while (true) {
                     String msg = (String) entrada.readObject();
-                    procesarMensaje(msg);
+                    recibirMovimiento(msg);
                 }
             } catch (Exception e) {
                 System.out.println("conexion perdida");
             }
         }).start();
     }
-
-    private void procesarMensaje(String msg) {
+    @Override
+    public void recibirMovimiento(String msg){
         String[] partes = msg.split(":");
 
         if (partes[0].equals("TNT")) {
@@ -74,7 +74,7 @@ public class JugadorSystem extends Jugador {
                 ventana.iniciarJuego();
             }
         } else if (msg.equals("PERDI")) {
-            System.out.println("rival perdio, yo gane!");
+            System.out.println("El rival tocó tu tnt! GANASTEE");
             if (ventana != null) {
                 ventana.mostrarGanaste();
             }
@@ -82,7 +82,7 @@ public class JugadorSystem extends Jugador {
     }
 
     @Override
-    public void realizarJugada(int fila, int columna) {
+    public void enviarMovimiento(int fila, int columna) {
         try {
             partida.procesarJugada(fila, columna);
         } catch (Exception e) {
@@ -131,5 +131,6 @@ public class JugadorSystem extends Jugador {
     public int[] getTNTRival() {
         return tntRival;
     }
+
 
 }

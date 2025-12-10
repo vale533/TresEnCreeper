@@ -1,6 +1,6 @@
 package org.example;
 
-public abstract class Jugador {
+public abstract class Jugador implements ComunicacionJugador{
     public String nombre;
     JuegoPrincipal partida;
 
@@ -12,5 +12,4 @@ public abstract class Jugador {
     }
 
 
-    public abstract void realizarJugada(int fila, int columna);
 }
